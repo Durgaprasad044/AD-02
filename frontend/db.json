@@ -1,0 +1,69 @@
+{
+  "posts": [
+    {
+      "id": "1",
+      "content": "Just finished the hackathon! What an amazing experience building AI models.",
+      "createdAt": "2024-02-18T10:00:00Z",
+      "likes": 5,
+      "author": {
+        "id": "2",
+        "name": "Alex Chen",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex"
+      }
+    },
+    {
+      "id": "2",
+      "content": "Anyone going to the React conference next month?",
+      "createdAt": "2024-02-17T15:30:00Z",
+      "likes": 12,
+      "author": {
+        "id": "3",
+        "name": "Sarah Jones",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah"
+      }
+    }
+  ],
+  "matches": [
+    {
+      "id": "1",
+      "name": "David Kim",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
+      "bio": "Full Stack Developer obsessed with scalable architecture.",
+      "skills": ["React", "Node.js", "AWS"],
+      "compatibilityScore": 95
+    },
+    {
+      "id": "2",
+      "name": "Emily White",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Emily",
+      "bio": "UX Designer looking for a dev partner for a side project.",
+      "skills": ["Figma", "UI/UX", "Prototyping"],
+      "compatibilityScore": 88
+    }
+  ],
+  "chats": [
+    {
+      "id": "1",
+      "name": "David Kim",
+      "lastMessage": {
+        "content": "Hey, do you want to collaborate?"
+      }
+    }
+  ],
+  "messages": [
+    {
+      "id": "1",
+      "chatId": "1",
+      "senderId": "2",
+      "content": "Hey, do you want to collaborate?",
+      "createdAt": "2024-02-18T12:00:00Z"
+    }
+  ],
+  "me": {
+    "id": "1",
+    "name": "Demo User",
+    "email": "demo@example.com",
+    "bio": "Passionate developer.",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Demo"
+  }
+}

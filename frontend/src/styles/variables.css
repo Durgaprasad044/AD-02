@@ -1,0 +1,55 @@
+:root {
+  --color-primary: #a67c52;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #e2d8c3;
+  --color-secondary-foreground: #5c4d3f;
+
+  --color-accent: #d4c8aa;
+  --color-accent-foreground: #4a3f35;
+
+  --color-background: #f5f1e6;
+  --color-foreground: #4a3f35;
+
+  --color-card: #fffcf5;
+  --color-card-foreground: #4a3f35;
+
+  --color-muted: #ece5d8;
+  --color-muted-foreground: #7d6b56;
+
+  --color-destructive: #b54a35;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: #dbd0ba;
+  --color-input: #dbd0ba;
+  --color-ring: #a67c52;
+
+  --color-sidebar: #ece5d8;
+  --color-sidebar-foreground: #4a3f35;
+
+  /* Spacing System (8px Grid) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows for paper theme */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-md: 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+  --transition-slow: 0.4s ease-in-out;
+}
