@@ -118,7 +118,7 @@ const Navbar = () => {
           ) : (
             <button 
               className="btn-primary" 
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/login')}
               style={{ 
                 padding: '8px 20px', 
                 backgroundColor: 'var(--color-primary)', 

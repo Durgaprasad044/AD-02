@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../store/slices/authSlice';
+import { loginUser, loginWithGoogle } from '../store/slices/authSlice';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import '../index.css';
@@ -17,7 +17,14 @@ const LoginScreen = () => {
     e.preventDefault();
     const result = await dispatch(loginUser({ email, password }));
     if (loginUser.fulfilled.match(result)) {
-      navigate('/');
+      navigate('/dashboard');
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    const result = await dispatch(loginWithGoogle());
+    if (loginWithGoogle.fulfilled.match(result)) {
+      navigate('/dashboard');
     }
   };
 
@@ -87,6 +94,19 @@ const LoginScreen = () => {
             style={{ width: '100%' }}
           />
         </form>
+        <div style={{ marginTop: 'var(--spacing-lg)', textAlign: 'center' }}>
+          <div style={{ marginBottom: 'var(--spacing-md)', color: 'var(--color-muted-foreground)', fontSize: '0.9rem' }}>
+            or continue with
+          </div>
+          <Button
+            type="button"
+            label="Continue with Google"
+            variant="secondary"
+            loading={loading}
+            style={{ width: '100%' }}
+            onClick={handleGoogleLogin}
+          />
+        </div>
       </Card>
     </div>
   );

@@ -106,7 +106,7 @@ const Navbar = ({ onMenuClick }) => {
             </>
           ) : (
             <button 
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/login')}
               style={{ padding: '8px 20px', backgroundColor: 'var(--color-primary)', color: 'var(--color-primary-foreground)', fontWeight: '600', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer' }}
             >
               Log In

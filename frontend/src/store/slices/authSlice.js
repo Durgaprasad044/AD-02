@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authService from '../../services/auth.service';
+import { firebaseGoogleLogin } from '../../services/firebaseAuth.service';
 
 // Login
 export const loginUser = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
@@ -9,6 +10,24 @@ export const loginUser = createAsyncThunk('auth/login', async (credentials, { re
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response?.data || error.message);
+  }
+});
+
+// Google Login (Firebase)
+export const loginWithGoogle = createAsyncThunk('auth/loginWithGoogle', async (_, { rejectWithValue }) => {
+  try {
+    const { user, idToken } = await firebaseGoogleLogin();
+
+    // Store Firebase ID token in localStorage to keep the rest of the
+    // app's auth flow (API client, protected routes) working consistently.
+    localStorage.setItem('token', idToken);
+
+    return {
+      user,
+      token: idToken,
+    };
+  } catch (error) {
+    return rejectWithValue(error.message || 'Google login failed');
   }
 });
 
@@ -65,6 +84,21 @@ const authSlice = createSlice({
         state.token = action.payload.token;
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Google Login
+      .addCase(loginWithGoogle.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginWithGoogle.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+      })
+      .addCase(loginWithGoogle.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

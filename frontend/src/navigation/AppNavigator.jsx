@@ -6,6 +6,7 @@ import Loader from '../components/common/Loader';
 
 // Lazy loaded screens
 const LandingScreen = lazy(() => import('../screens/LandingScreen'));
+const LoginScreen = lazy(() => import('../screens/LoginScreen'));
 const DashboardScreen = lazy(() => import('../screens/DashboardScreen'));
 const MatchesScreen = lazy(() => import('../screens/MatchesScreen'));
 const FeedScreen = lazy(() => import('../screens/FeedScreen'));
@@ -25,8 +26,9 @@ export default function AppNavigator() {
     <Router>
       <Suspense fallback={<div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center' }}><Loader /></div>}>
         <Routes>
-          {/* Public Route */}
+          {/* Public Routes */}
           <Route path="/" element={<LandingScreen />} />
+          <Route path="/login" element={<LoginScreen />} />
           
           {/* Protected Routes */}
           <Route path="/dashboard" element={<ProtectedRoute><DashboardScreen /></ProtectedRoute>} />
