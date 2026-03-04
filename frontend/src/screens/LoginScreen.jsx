@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { loginUser, loginWithGoogle } from '../store/slices/authSlice';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
+import { useAuth } from '../context/AuthContext';
 import '../index.css';
 
 const LoginScreen = () => {
@@ -12,6 +13,10 @@ const LoginScreen = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.auth);
+  const { isAuthenticated } = useAuth();
+
+  // Already signed in — go straight to dashboard.
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

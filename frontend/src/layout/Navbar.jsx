@@ -2,11 +2,18 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
+import useAuthUser from '../hooks/useAuthUser';
+import { signOut as firebaseSignOut } from '../firebase/auth';
 
 const Navbar = ({ onMenuClick }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { user: reduxUser, isAuthenticated: reduxIsAuthenticated } = useSelector((state) => state.auth);
+  const { profile, firebaseUser, isAuthenticated: firebaseIsAuthenticated } = useAuthUser();
+
+  const isAuthenticated = reduxIsAuthenticated || firebaseIsAuthenticated;
+  // Priority: Firestore profile name → Firebase auth displayName → Redux user name → fallback
+  const displayName = profile?.name || firebaseUser?.displayName || reduxUser?.displayName || reduxUser?.name || 'User';
 
   const navStyle = {
     height: '72px',
@@ -89,16 +96,32 @@ const Navbar = ({ onMenuClick }) => {
           {isAuthenticated ? (
             <>
               <div style={{ textAlign: 'right', cursor: 'pointer' }} onClick={() => navigate('/profile')}>
-                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-foreground)' }}>{user?.name || 'User'}</div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-foreground)' }}>{displayName}</div>
               </div>
-              <div 
-                style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary-foreground)', fontWeight: 'bold', cursor: 'pointer' }}
+              <div
+                style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary-foreground)', fontWeight: 'bold', cursor: 'pointer', overflow: 'hidden' }}
                 onClick={() => navigate('/profile')}
               >
-                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                {profile?.photoURL ? (
+                  <img
+                    src={profile.photoURL}
+                    alt={displayName}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  (displayName || 'U').charAt(0).toUpperCase()
+                )}
               </div>
               <button 
-                onClick={() => { dispatch(logout()); navigate('/'); }}
+                onClick={async () => { 
+                  dispatch(logout()); 
+                  try {
+                    await firebaseSignOut();
+                  } catch (e) {
+                    console.error('Firebase sign out failed', e);
+                  }
+                  navigate('/login'); 
+                }}
                 style={{ color: 'var(--color-muted-foreground)', fontWeight: 500, fontSize: '0.875rem', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 Logout

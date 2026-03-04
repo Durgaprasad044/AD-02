@@ -1,11 +1,59 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import Button from '../components/common/Button';
+import { useAuth } from '../context/AuthContext';
+import { getEvents, getPosts } from '../firebase/firestore';
 
 export default function DashboardScreen() {
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+  const { profile, loading: userLoading } = useAuth();
+  const [event, setEvent] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadData = async () => {
+      try {
+        const [eventResult, postsResult] = await Promise.all([
+          getEvents(),
+          getPosts({ limitCount: 5 }),
+        ]);
+
+        if (!isMounted) return;
+        setEvent(eventResult);
+        setPosts(postsResult);
+        setDataLoading(false);
+      } catch (err) {
+        console.error('Failed to load dashboard data', err);
+        if (!isMounted) return;
+        setDataLoading(false);
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const firstName = useMemo(() => {
+    if (profile?.name) {
+      return profile.name.split(' ')[0];
+    }
+    return 'User';
+  }, [profile]);
+
+  const smartMatchesCount = useMemo(() => {
+    const skills = Array.isArray(profile?.skills) ? profile.skills : [];
+    if (skills.length === 0) return 0;
+    return Math.min(10, skills.length * 2);
+  }, [profile]);
+
+  const latestPost = posts[0] || null;
+  const isLoading = userLoading || dataLoading;
 
   return (
     <div className="container section flex-column gap-xl animate-fade-in" style={{
@@ -15,7 +63,7 @@ export default function DashboardScreen() {
       <div className="flex-between">
         <div>
           <h1 style={{ marginBottom: 'var(--spacing-xs)', fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
-            Welcome back, {user?.name?.split(' ')[0] || 'User'}
+            {isLoading ? 'Loading your dashboard...' : `Welcome back, ${firstName}`}
           </h1>
           <p className="text-large" style={{ color: 'var(--color-muted-foreground)' }}>Here&apos;s what&apos;s happening in your network today.</p>
         </div>
@@ -33,10 +81,14 @@ export default function DashboardScreen() {
           <div className="flex-between">
             <h3 style={{ fontSize: '1.25rem' }}>Smart Matches</h3>
             <span style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-primary-foreground)', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.8rem', fontWeight: 'bold' }}>
-              3 New
+              {smartMatchesCount || 0} New
             </span>
           </div>
-          <p style={{ lineHeight: '1.6' }}>We found 3 high-compatibility professionals matching your skills.</p>
+          <p style={{ lineHeight: '1.6' }}>
+            {smartMatchesCount
+              ? `We found ${smartMatchesCount} high-compatibility professionals matching your skills.`
+              : 'Add more skills to your profile to see smart matches here.'}
+          </p>
           <div style={{ marginTop: 'auto' }}>
             <Button 
               label="View All Matches" 
@@ -56,10 +108,20 @@ export default function DashboardScreen() {
             <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: 'var(--color-accent)', display: 'inline-block', border: '2px solid var(--color-primary)' }}></span>
           </div>
           <div>
-            <h4 style={{ marginBottom: '8px', fontSize: '1.1rem' }}>Global Tech Summit 2026</h4>
-            <p className="text-small" style={{ color: 'var(--color-primary)' }}>San Francisco, CA • May 15 - 17</p>
+            <h4 style={{ marginBottom: '8px', fontSize: '1.1rem' }}>
+              {event?.name || 'No active event'}
+            </h4>
+            <p className="text-small" style={{ color: 'var(--color-primary)' }}>
+              {event
+                ? `${event.location || ''} • ${event.date || ''}`
+                : 'Stay tuned for upcoming events.'}
+            </p>
           </div>
-          <p style={{ lineHeight: '1.6' }}>You have 12 potential networking opportunities at this event.</p>
+          <p style={{ lineHeight: '1.6' }}>
+            {event?.opportunities
+              ? `You have ${event.opportunities} potential networking opportunities at this event.`
+              : 'You will see networking opportunities here once an event is active.'}
+          </p>
           <div style={{ marginTop: 'auto' }}>
             <Button 
               label="Event Details" 
@@ -73,13 +135,19 @@ export default function DashboardScreen() {
         {/* Network Activity */}
         <div className="card flex-column gap-md">
           <h3 style={{ fontSize: '1.25rem' }}>Network Activity</h3>
-          <p style={{ lineHeight: '1.6' }}>2 of your connections posted new updates.</p>
-          <div style={{ padding: 'var(--spacing-md)', backgroundColor: 'var(--color-muted)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
-            <div style={{ fontWeight: 600, fontSize: '0.95rem', marginBottom: '8px', color: 'var(--color-foreground)' }}>Alex Chen</div>
-            <p className="text-small" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--color-muted-foreground)' }}>
-              Looking forward to discussing AI infrastructure at the summit...
-            </p>
-          </div>
+          <p style={{ lineHeight: '1.6' }}>
+            {latestPost ? 'Here is the latest update from your network.' : 'No recent network activity yet.'}
+          </p>
+          {latestPost && (
+            <div style={{ padding: 'var(--spacing-md)', backgroundColor: 'var(--color-muted)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
+              <div style={{ fontWeight: 600, fontSize: '0.95rem', marginBottom: '8px', color: 'var(--color-foreground)' }}>
+                {latestPost.userName || 'Unknown User'}
+              </div>
+              <p className="text-small" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--color-muted-foreground)' }}>
+                {latestPost.message || ''}
+              </p>
+            </div>
+          )}
           <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'flex-start' }}>
             <button
               onClick={() => navigate('/feed')}

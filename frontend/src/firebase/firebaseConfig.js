@@ -1,8 +1,7 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, browserLocalPersistence, setPersistence } from 'firebase/auth';
 
 // Firebase config values are read from Vite environment variables.
-// Fill these in your frontend `.env` file (VITE_FIREBASE_...).
 const firebaseConfig = {
   apiKey: "AIzaSyAgelu6DTYrjMpfGpQVRfhK29ABTD0tJV8",
   authDomain: "ad-02-b228e.firebaseapp.com",
@@ -19,5 +18,11 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase Auth
 export const firebaseAuth = getAuth(app);
 
-export default app;
+// Explicitly set LOCAL persistence so that:
+// 1. Sessions survive hard page refreshes (read from IndexedDB/localStorage)
+// 2. onAuthStateChanged reliably fires with the stored user on every app mount
+setPersistence(firebaseAuth, browserLocalPersistence).catch((err) => {
+  console.error('[Firebase] Failed to set auth persistence:', err);
+});
 
+export default app;

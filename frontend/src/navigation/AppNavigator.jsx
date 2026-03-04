@@ -1,8 +1,8 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import Layout from '../layout/Layout';
 import Loader from '../components/common/Loader';
+import { useAuth } from '../context/AuthContext';
 
 // Lazy loaded screens
 const LandingScreen = lazy(() => import('../screens/LandingScreen'));
@@ -15,9 +15,20 @@ const ProfileScreen = lazy(() => import('../screens/ProfileScreen'));
 const EventsScreen = lazy(() => import('../screens/EventsScreen'));
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useSelector((state) => state.auth);
-  // Optional: If you want to strictly protect
-  // if (!isAuthenticated) return <Navigate to="/" replace />;
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
+        <Loader />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
   return <Layout>{children}</Layout>;
 };
 

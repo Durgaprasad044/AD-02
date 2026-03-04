@@ -1,326 +1,230 @@
-# 🎨 ATRIUS – Vintage Paper Theme Update
-## Complete UI Refactor with Provided Color Palette
-## NO HARDCODE POLICY APPLIES
+You are a senior full-stack engineer.
 
----
+Your task is to convert my current frontend dashboard into a REAL production-level dashboard using Firebase Authentication and Firestore so the UI shows the logged-in user's actual information instead of static placeholders like "User".
 
-# 🚨 GLOBAL RULE
+IMPORTANT:
+Do NOT redesign the UI.
+Keep the existing design, layout, and styles exactly the same.
+Only connect the UI to real data.
 
-1. ❌ NO hardcoded colors anywhere inside components
-2. ❌ No inline hex values in JSX
-3. ❌ No random Tailwind colors (like bg-green-500, text-gray-800)
-4. ✅ All colors must use CSS variables from theme system
-5. ✅ All components must inherit design tokens
+--------------------------------------------------
 
----
+GOALS
 
-# 🎨 DESIGN STYLE GOAL
+1. Replace all static "User" placeholders with real logged-in user data.
+2. Load user profile information from Firebase Authentication and Firestore.
+3. Make the dashboard behave like a real professional website.
 
-This is NOT a modern neon SaaS UI.
+--------------------------------------------------
 
-This is:
+AUTHENTICATION REQUIREMENTS
 
-• Warm
-• Editorial
-• Paper-like
-• Elegant
-• Soft shadows
-• Minimal glow
-• Calm contrast
-• Slight vintage aesthetic
+Use Firebase Authentication.
 
-Think:
-- Premium notebook
-- Conference brochure
-- Elegant journal
-- Soft paper dashboard
+Get the logged-in user using:
 
----
+onAuthStateChanged(auth, callback)
 
-# 🧱 IMPLEMENTATION REQUIREMENTS
+If the user is not logged in:
+redirect to /login.
 
-## 1️⃣ Create Global Theme Variables
+If the user is logged in:
+load their profile data.
 
-Update:
+--------------------------------------------------
 
-src/styles/variables.css
+USER DATA STRUCTURE (Firestore)
 
-Define CSS variables:
+Create a Firestore collection:
 
-:root {
-  --color-primary: #a67c52;
-  --color-primary-foreground: #ffffff;
+users
 
-  --color-secondary: #e2d8c3;
-  --color-secondary-foreground: #5c4d3f;
+Document ID = user.uid
 
-  --color-accent: #d4c8aa;
-  --color-accent-foreground: #4a3f35;
+Structure:
 
-  --color-background: #f5f1e6;
-  --color-foreground: #4a3f35;
+users/
+   uid/
+      name: string
+      email: string
+      photoURL: string
+      company: string
+      title: string
+      skills: array
+      connections: number
+      eventsJoined: number
+      createdAt: timestamp
 
-  --color-card: #fffcf5;
-  --color-card-foreground: #4a3f35;
+--------------------------------------------------
 
-  --color-muted: #ece5d8;
-  --color-muted-foreground: #7d6b56;
+DASHBOARD REQUIREMENTS
 
-  --color-destructive: #b54a35;
-  --color-destructive-foreground: #ffffff;
+Replace static UI values with real data.
 
-  --color-border: #dbd0ba;
-  --color-input: #dbd0ba;
-  --color-ring: #a67c52;
+1️⃣ Header
 
-  --color-sidebar: #ece5d8;
-  --color-sidebar-foreground: #4a3f35;
-}
+Current:
+User   [U]
 
----
+Replace with:
 
-## 2️⃣ Update Global Styles
+User's name
+User avatar (photoURL)
 
-In:
+If no image:
+show first letter of name.
 
-src/styles/globals.css
+Example:
 
-Apply:
+Durga Prasad   [D]
 
-body {
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-family: 'Inter', serif;
-}
+--------------------------------------------------
 
-Add subtle texture feel using:
+2️⃣ Welcome Message
 
-background-image: radial-gradient(
-  rgba(166,124,82,0.03) 1px,
-  transparent 1px
-);
-background-size: 20px 20px;
+Replace
 
-Keep extremely subtle.
+Welcome back, User
 
----
+with
 
-# 🃏 CARD SYSTEM UPDATE
+Welcome back, {user.name}
 
-All cards must:
+--------------------------------------------------
 
-• Use background: var(--color-card)
-• Border: 1px solid var(--color-border)
-• Soft shadow:
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-• Rounded corners: 12px
+3️⃣ Smart Matches
 
-Remove:
-❌ Dark gradients
-❌ Neon glows
-❌ Glassmorphism
+Generate dynamic matches based on shared skills.
 
-Add:
-✔ Soft lift on hover
-✔ Subtle border highlight on hover
+Example:
 
----
+"We found 3 professionals matching your skills."
 
-# 🔘 BUTTON SYSTEM UPDATE
+Use dummy data for now if backend is not implemented.
 
-Primary Button:
+--------------------------------------------------
 
-background: var(--color-primary);
-color: var(--color-primary-foreground);
-border-radius: 10px;
-transition: all 0.2s ease;
+4️⃣ Active Event Card
 
-Hover:
-background: slightly darker primary (computed in CSS)
+Load event from Firestore:
 
-Secondary Button:
+events/
+   eventId
+      name
+      location
+      date
+      opportunities
 
-background: var(--color-secondary);
-color: var(--color-secondary-foreground);
+Example:
 
-Destructive Button:
+Global Tech Summit 2026
+San Francisco, CA
+May 15-17
 
-background: var(--color-destructive);
-color: var(--color-destructive-foreground);
+--------------------------------------------------
 
----
+5️⃣ Network Activity
 
-# 🧭 NAVBAR UPDATE
+Load posts from Firestore:
 
-Navbar must:
+posts/
+   postId
+      userName
+      message
+      timestamp
 
-• Background: var(--color-card)
-• Border-bottom: 1px solid var(--color-border)
-• Height: 72px
-• Soft typography
+Show the most recent post.
 
-Active link:
-color: var(--color-primary)
-border-bottom: 2px solid var(--color-primary)
+--------------------------------------------------
 
-No glow.
-No animation flicker.
+FIREBASE FILE STRUCTURE
 
----
+src/
+  firebase/
+     firebaseConfig.js
+     auth.js
+     firestore.js
 
-# 📂 SIDEBAR UPDATE
+firebaseConfig.js
 
-Sidebar:
+Initialize Firebase.
 
-background: var(--color-sidebar)
-border-right: 1px solid var(--color-border)
+auth.js
 
-Active item:
-background: var(--color-accent)
-color: var(--color-accent-foreground)
+Export:
 
----
+auth
+onAuthStateChanged
+signOut
 
-# 🧠 MATCH CARD UPDATE
+firestore.js
 
-MatchCard must:
+Functions:
 
-• Card background: var(--color-card)
-• Compatibility ring: use primary color
-• Shared skills: accent background
-• Reasoning section: muted background
+getUserProfile(uid)
+createUserProfile(user)
+getEvents()
+getPosts()
 
-No dark styling.
-No green neon.
+--------------------------------------------------
 
----
+REACT LOGIC
 
-# 👤 PROFILE UPDATE
+Create a hook:
 
-ProfileCard must:
+useAuthUser()
 
-• Card surface
-• Accent section for availability
-• Skills use accent tone
-• Goals use secondary tone
+This should:
 
-Everything must feel warm and paper-like.
+• detect login state
+• fetch Firestore profile
+• return user data
 
----
+--------------------------------------------------
 
-# 📰 FEED UPDATE
+AVATAR LOGIC
 
-Feed:
+If photoURL exists:
+show profile image
 
-• Post cards use card surface
-• Muted metadata text
-• Primary for interaction buttons
-• Soft divider lines (border color)
+Else:
 
----
+show first letter of name inside avatar circle.
 
-# 💬 CHAT UPDATE
+--------------------------------------------------
 
-Chat layout:
+PROTECTED ROUTES
 
-Left panel:
-background: var(--color-sidebar)
+Create:
 
-Chat window:
-background: var(--color-card)
+ProtectedRoute component
 
-Own message:
-background: var(--color-accent)
+Behavior:
 
-Other message:
-background: var(--color-muted)
+if user not authenticated → redirect /login
 
----
+--------------------------------------------------
 
-# 📊 CHART COLORS
+REAL WEBSITE EXPERIENCE
 
-If charts exist:
+Implement:
 
-Chart 1: #a67c52
-Chart 2: #8d6e4c
-Chart 3: #735a3a
-Chart 4: #b3906f
-Chart 5: #c0a080
+• persistent login
+• loading state while fetching user
+• logout functionality
+• clean error handling
 
-Must be referenced via config file.
-Not inline.
+--------------------------------------------------
 
----
+OUTPUT
 
-# 🎨 TYPOGRAPHY
+Provide full code for:
 
-Headings:
-• Font-weight: 600–700
-• Slight letter spacing
-• Large margins
+• Firebase config
+• authentication hook
+• Firestore user profile fetch
+• dashboard integration
+• avatar logic
+• protected route
 
-Body:
-• Softer contrast
-• Use muted for secondary text
-
-No ultra-bold heavy black text.
-
----
-
-# 🧩 COMPONENT RULES
-
-Every component must:
-
-• Import design tokens
-• Never define hex colors inline
-• Never define random shadows
-• Never use Tailwind default colors
-• Use theme variables only
-
----
-
-# 🔥 FINAL RESULT TARGET
-
-UI must feel:
-
-• Warm
-• Thoughtful
-• Professional
-• Elegant
-• Calm
-• Conference-ready
-• Print-quality aesthetic
-
-Not:
-
-• Neon startup
-• Hacker dashboard
-• Dark SaaS
-• Futuristic glass
-
----
-
-# 🧱 CLEANUP TASK
-
-Remove:
-
-❌ All dark theme styles
-❌ All neon glows
-❌ All heavy shadows
-❌ All gradient backgrounds
-❌ All hardcoded Tailwind color classes
-
-Replace with theme variables.
-
----
-
-# 🚀 OUTPUT EXPECTATION
-
-Refactor entire UI to:
-
-✔ Fully theme-driven system
-✔ Vintage paper aesthetic
-✔ Clean spacing system
-✔ Soft professional layout
-✔ Scalable token-based design
-✔ Zero hardcode violations
+The final dashboard must display the logged-in user's real data instead of "User".
