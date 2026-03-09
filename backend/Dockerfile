@@ -1,19 +1,15 @@
-# Build stage
-FROM python:3.12-slim AS builder
+FROM node:18-alpine
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+COPY package*.json ./
+RUN npm install
 
-# Runtime stage
-FROM python:3.12-slim
-
-WORKDIR /app
-
-COPY --from=builder /install /usr/local
 COPY . .
 
-EXPOSE 8000
+RUN node_modules/.bin/prisma generate
+RUN node_modules/.bin/tsc
 
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 5000
+
+CMD ["node", "-e", "console.log('NODE STARTED'); console.log('PORT:', process.env.PORT); console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL); try { require('./dist/index.js'); } catch(e) { console.error('REQUIRE ERROR:', e); process.exit(1); }"]
